@@ -14,3 +14,46 @@ In the rapid advancement of commercial Wi-Fi devices, this project explores a Wi
 ## Overview of the system
 <img src="https://github.com/wanrylin/Human-Motion-Detection-using-WiFi/blob/main/figure/Master%20project.png" alt="overview of system" width="800"><br>
 In this project, human motion is monitored using Channel-State-Information (CSI). CSI data provides amplitude and phase time sequences for each subcarrier, forming the foundation for an amplitude and phase-based system. A Support-Vector-Machine (SVM) is trained to determine the presence of human movement, while a random forest differentiates walking from other motions. Additionally, two 1-Dimensional Convolutional Neural Networks are utilized: one to identify the direction of movement and another to classify five distinct types of motion. The entire system's workflow is depicted in the figure.
+
+## Condition and assumption
+(1)Wireless transmission protocol of the WiFi device: IEEE 802.1n <br>
+(2)Operating frequency band: 2.4GHz<br>
+(3)Number of transmitting antennas: 2<br>
+(4)Number of receiving antennas: 2<br>
+(5)Type of antennas: omni antenna<br>
+(6)Application scenario: indoor through concrete wall<br>
+(7)Sampling rate: 200Hz<br>
+
+## System Design
+### 1 CSI data capturing
+
+
+### 2 CSI phase denoising
+
+
+### 3 Movement detection
+
+
+### 4 Motion seperation
+
+
+### 5 Motion classification
+
+#### Channel clean
+
+#### Feature process
+
+#### 1DCNN classifier
+
+
+
+## Result and conclusion
+### Result
+
+
+### Conclusion
+
+
+
+
+## Reference 
