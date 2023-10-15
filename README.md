@@ -31,16 +31,16 @@ In this project, the PicoScenes[^1] platform, installed on two Ubuntu desktops, 
 ### 2 CSI phase denoising
 This project reveals that denoised CSI phase data is more stable and less noise-sensitive than amplitude, making it preferable for movement detection. However, as discussed in chapter 4.1, network cards induce a random phase offset in CSI data, overshadowing phase changes caused by human movement. Previous research cited as Indotrack[^2] introduced an algorithm to counteract this randomness.<br>
 Commodity Wi-Fi devices lack tight time synchronization between receivers and transmitters, leading to a random phase offset, $e^{j\theta_{offset}}$, in each CSI sample as shown in equation \eqref{5.1}:
-\[
+$$
 \begin{split}
 x(f,t_0 + t) &= e^{j\theta_{offset}}(\sum_{m=1}^{M}A_me^{-j2\pi f \tau_m} +A_p(t)e^{-j2\pi f_p \tau_p} )\\
 & = e^{j\theta_{offset}}(x_s(f,t_0) + A_p(t)e^{-j2\pi f_p \tau_p} )
 \end{split}
 \label{5.1}
-\]
+$$
 This scenario complicates the observation of the Doppler effect. To address these issues, the following steps are proposed:
 <b>1 Conjugate multiplication:</b> Utilizing the fact that Wi-Fi cards' antennas share the same RF oscillator, conjugate multiplication between two antennas' CSI is possible, effectively eliminating random phase offsets as per equation \eqref{5.2}:
-\[
+$$
 \begin{split}
 x_{cm}(f,t_0 + t) &= x_1(f,t_0 + t)\bar{x}_2(f,t_0 + t)\\
 &=(x_{1,s}(f,t_0) + A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}} )(\bar{x}_{2,s}(f,t_0) + A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}} )\\
@@ -49,10 +49,10 @@ x_{cm}(f,t_0 + t) &= x_1(f,t_0 + t)\bar{x}_2(f,t_0 + t)\\
 \underbrace{A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}}A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}}}_{\textcircled{4}} 
 \end{split}
 \label{5.2}
-\]
+$$
 <b>2 Remove static component:</b> The static-path component product (\textcircled{1}) is considered constant over short periods and is subtracted from the conjugate multiplication to prevent interference with Doppler monitoring.<br>
 <b>3 Adjust the power of each antenna:</b> By modifying the power of static components for each antenna (subtracting $\alpha$ and adding $\beta$), the Doppler effect information is preserved, and the correct phase becomes prominent in the spectrum, as equation \eqref{5.3} explains:
-\[
+$$
 \begin{split}
 &x_{cm}(f,t_0 + t) - x_{1,s}(f,t_0)\bar{x}_{2,s}(f,t_0) = x_1(f,t_0 + t)\bar{x}_2(f,t_0 + t) - x_{1,s}(f,t_0)\bar{x}_{2,s}(f,t_0)\\
 &\approx (x_{1,s}(f,t_0) - \alpha)A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}} +
@@ -60,7 +60,7 @@ x_{cm}(f,t_0 + t) &= x_1(f,t_0 + t)\bar{x}_2(f,t_0 + t)\\
 &\approx (\bar{x}_{2,s}(f,t_0) + \beta)A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}}
 \end{split}
 \label{5.3}
-\]
+$$
 These strategies effectively remove random CSI phase offsets. The denoising algorithm's efficacy is evident when comparing pre- and post-denoising CSI data, as illustrated in following figure.
 <p float="left">
   <img src="https://github.com/wanrylin/Human-Motion-Detection-using-WiFi/blob/main/figure/phase%20correction0.png" width="300" />
