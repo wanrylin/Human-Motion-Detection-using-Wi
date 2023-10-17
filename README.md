@@ -1,3 +1,4 @@
+
 # Human Motion Detection using Wi-Fi 2022
 This is my Master project in NUS.<br>
 My superviser is Prof.Cuo Yongxin homepage:https://www.ece.nus.edu.sg/stfpage/eleguoyx/.
@@ -31,13 +32,11 @@ In this project, the PicoScenes[^1] platform, installed on two Ubuntu desktops, 
 ### 2 CSI phase denoising
 This project reveals that denoised CSI phase data is more stable and less noise-sensitive than amplitude, making it preferable for movement detection. However, as discussed in chapter 4.1, network cards induce a random phase offset in CSI data, overshadowing phase changes caused by human movement. Previous research cited as Indotrack[^2] introduced an algorithm to counteract this randomness.<br>
 Commodity Wi-Fi devices lack tight time synchronization between receivers and transmitters, leading to a random phase offset, $e^{j\theta_{offset}}$, in each CSI sample as shown in equation \eqref{5.1}:
-$$
-\begin{split}
+$$\begin{split}
 x(f,t_0 + t) &= e^{j\theta_{offset}}(\sum_{m=1}^{M}A_me^{-j2\pi f \tau_m} +A_p(t)e^{-j2\pi f_p \tau_p} )\\
 & = e^{j\theta_{offset}}(x_s(f,t_0) + A_p(t)e^{-j2\pi f_p \tau_p} )
 \end{split}
-\label{5.1}
-$$
+\label{5.1}$$
 This scenario complicates the observation of the Doppler effect. To address these issues, the following steps are proposed:
 <b>1 Conjugate multiplication:</b> Utilizing the fact that Wi-Fi cards' antennas share the same RF oscillator, conjugate multiplication between two antennas' CSI is possible, effectively eliminating random phase offsets as per equation \eqref{5.2}:
 $$
