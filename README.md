@@ -177,10 +177,11 @@ Following the convolution layer, there is a substantial increase in the number o
 **For other motion direction classification**, the structure comprises 1 input layer and 4 convolutional layers, followed by 1 dense layer and 1 output layer. Here, $N$ is set to 190. The first convolutional layer has $n_{filter} = 128$ and $kernel\ size = 3$, and the second $n_{filter} = 96$ and $kernel\ size = 3$. Each convolutional layer is succeeded by a maxpooling layer with a kernel size of 2. The subsequent two convolutional layers have $n_{filter} = 64$, $kernel\ size = 3$ and $n_{filter} = 32$, $kernel\ size = 5$, respectively.
 
 ## Result and conclusion
-**1**To the best of my acknowledgment, this system is the first one to detect 7 human motions in through the wall scenario.<br>
-**2**
+**(1)**
+To the best of my acknowledgment, this system is the first one to detect 7 human motions in through the wall scenario.<br>
+**(2)**
 I successfully design a system for through the wall scenario that can achieve 98\% accuracy in human movement detection and over 95\% accuracy in human motion classification. <br>
-**3**
+**(3)**
 I proposed a new channel clean algorithm especially for reduce the multipath interference in through the wall scenario.
 
 
