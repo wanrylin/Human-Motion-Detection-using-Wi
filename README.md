@@ -122,6 +122,7 @@ As indicated in previous equation, multipath fading presents significant challen
 </p>
 In the right figure, we observe a notable variance in the amplitude velocity at the start of the motion compared to its conclusion. This difference can be attributed to the subject moving away from the antenna. As the distance increases, the effective area reflecting the signal diminishes, and the length of the human-reflected channel extends. Consequently, the signal undergoes stronger fading, leading to a decrease in the CSI amplitude velocity. Conversely, the left figure shows that when the subject's position relative to the antenna remains constant during the motion, the CSI amplitude velocity does not exhibit significant drops, unlike when walking away from the antenna. This stark contrast in CSI amplitude velocity, influenced by the motion's range, provides a method to distinguish walking from other types of movement.
 
+
 Echoing the approach in Section 3, Principal Component Analysis (PCA) is employed for integrating subcarrier data. In this instance, however, only the first component of PCA is utilized. To highlight the differences in velocity distribution, a histogram of the distribution is computed. To optimize computation efficiency, the histogram is constructed using only 10 bins, and the value of each bin is selected as the feature for analysis.
 
 In this system, due to the non-linear nature of the classification boundary, I employed a Random Forest classifier. Ensemble learning, which Random Forest is a prime example of, seeks to surmount the limitations of individual models by integrating multiple models, thus enabling them to learn collectively for enhanced results. Random Forest achieves high classification accuracy and robust generalization by amalgamating multiple decision trees, each trained on different subsets of samples and features. This method helps in reducing overfitting, thereby bolstering the robustness and accuracy of the overall model[^3].
@@ -132,11 +133,22 @@ The Random Forest algorithm uses multiple decision tree classifiers for supervis
 
 For this specific application, the Random Forest parameters are set with $n = 10$ trees and a maximum tree depth of 5.
 
-
-
 ### 5 Motion classification
+In this section, subcarrier integration, resampling and denoising algorithms are same for walk classification and other motion classification.
 
 #### Channel clean
+As discussed in Section 4, CSI amplitude data is integrated using Principal Component Analysis (PCA), with the first 10 components being utilized. Subsequent to the discussion in Section 2, it is observed that the amplitude fluctuations caused by walking are significant enough to affect both channels. This indicates that the characteristics of walking motion are sufficiently distinct to overpower the noise and interference from multipath effects. However, for other motions, the signals from subsidiary channels tend to dominate, obscuring the fluctuations caused by human movement. To address this, I propose an algorithm aimed at mitigating interference from these subsidiary channels. Following left figure illustrates the first two components after applying PCA.
+
+<p float="left">
+  <img src="https://github.com/wanrylin/Human-Motion-Detection-using-WiFi/blob/main/figure/PCA%20amp.png" width="300" />
+  <img src="https://github.com/wanrylin/Human-Motion-Detection-using-WiFi/blob/main/figure/clean%20amp.png" width="300" /> 
+</p>
+
+**For the first component**, there is a noticeable difference in the mean values of the main and subsidiary channels. While it may seem straightforward to separate the two channels based on these mean values, setting a simple threshold to exclude subsidiary channel points is impractical. The amplitude values are closely related to the effective reflecting area of the subject, which varies between tests. Moreover, in cases of large-scale movement, the significant fluctuation could breach the threshold, leading to the loss of crucial data from the main channel. Consequently, an unsupervised classification algorithm, such as K-means clustering, is better suited for this task[^5]. In this system, K-means clusters the first PCA component by initially selecting $k = 2$ random points as cluster centers. The samples are then grouped according to their proximity to these centers, and the cluster means are iteratively recalculated until convergence. The smaller cluster, presumed to be the subsidiary channel, is subsequently discarded.
+
+**For other components**, the means of the main and subsidiary channels are less distinct. Additionally, the subsidiary channel may not be present in components other than the first. Therefore, the Hampel filter, a popular signal processing algorithm, is employed to remove outliers from these PCA components. The Hampel filter uses a sliding window to calculate the median and Median Absolute Deviation (MAD) at each point, with a threshold defined by the Hampel constant. Values exceeding this threshold are replaced by the window's median. For this dataset, the window size is set to 51 time steps, and the threshold is three times the standard deviation.
+
+Post-channel cleaning, the components undergo interpolation to fill in any gaps from removed samples. The effectiveness of this process is evident in the right figure, which showcases the successful removal of subsidiary channel interference following PCA.
 
 #### Feature process
 
@@ -159,3 +171,4 @@ For this specific application, the Random Forest parameters are set with $n = 10
 [^3]:Dang, Xiaochao, et al. "WiGId: Indoor group identification with CSI-based random forest." Sensors 20.16 (2020): 4607.
 [^4]:Hastie, Trevor, et al. The elements of statistical learning: data mining, inference, and prediction. Vol. 2. New York: springer, 2009.
 [^5]:Elbasiony, Reda, and Walid Gomaa. "WiFi localization for mobile robots based on random forests and GPLVM." 2014 13th International Conference on Machine Learning and Applications. IEEE, 2014.
+[^5]:Chen, Guoliang, et al. "Integrated WiFi/PDR/Smartphone using an unscented kalman filter algorithm for 3D indoor localization." Sensors 15.9 (2015): 24595-24614.
