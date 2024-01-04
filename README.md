@@ -39,7 +39,7 @@ x(f,t_0 + t) &= e^{j\theta_{offset}}(\sum_{m=1}^{M}A_me^{-j2\pi f \tau_m} +A_p(t
 \end{split}
 ```
 This scenario complicates the observation of the Doppler effect. To address these issues, the following steps are proposed:
-<b>1 Conjugate multiplication:</b> Utilizing the fact that Wi-Fi cards' antennas share the same RF oscillator, conjugate multiplication between two antennas' CSI is possible, effectively eliminating random phase offsets as per equation \eqref{5.2}:
+<b>1 Conjugate multiplication:</b> Utilizing the fact that Wi-Fi cards' antennas share the same RF oscillator, conjugate multiplication between two antennas' CSI is possible, effectively eliminating random phase offsets as per equation:
 ```math
 \begin{split}
 x_{cm}(f,t_0 + t) &= x_1(f,t_0 + t)\bar{x}_2(f,t_0 + t)\\
@@ -66,11 +66,46 @@ These strategies effectively remove random CSI phase offsets. The denoising algo
 </p>
 This denoising algorithm successfully eliminates random phase offsets caused by the network card.
 
-
-
-
-
 ### 3 Movement detection
+After denoising and segmenting, CSI phase data from Receiver 1 (Rx1) is processed, adhering to the IEEE 802.11n protocol, which includes 57 subcarriers each with unique CSI phase data. The experiment reveals that each subcarrier's sensitivity to human movement varies due to frequency differences. Some subcarriers are highly sensitive to movement but are also prone to noise interference, while others show less sensitivity to both movement and noise.
+
+Previous research indicates that in the absence of human movement, CSI values across subcarriers appear random and uncorrelated. However, when human movement occurs, these values become strongly correlated. The amplitude of CSI measurements varies across subcarriers, influencing their sensitivity in detecting human motion. Although there's a correlation in variations across all subcarriers, the degree of this correlation varies.
+
+To extract key features and minimize noise, I integrated all subcarriers using Principal Component Analysis (PCA), a method for transforming high-dimensional data into a lower-dimensional format while preserving most variability. The first 10 PCA components, representing over 99% of the dataset's characteristics, are retained for feature extraction. This approach also reveals the relationships between subcarriers. The CSI phase data, initially a $200 \times 57$ matrix, is dimensionally reduced to a $200 \times 10$ matrix through PCA. Following prior work, the first PCA component, typically noise-dominant, is excluded. Instead, the mean and variance of the first 10 PCA components are calculated and used as inputs for the Support Vector Machine (SVM). This method effectively illustrates the data's directional trends and core structures.
+
+Additionally, the static environment in the study encompasses two scenarios: an empty sensing area or a non-moving individual within it. To account for both, the training dataset includes three situations, labeling only significant human movements as positive. This augmented dataset, which incorporates static human presence, aids the SVM in better distinguishing significant human movements.
+
+Classification involves two stages: training and testing. In the training stage, a set of labeled samples is used to establish models for classification. Each sample in the training set, represented by a pair $(r_i,c_i)$, consists of a feature vector $r_i=(r_{i1},r_{i2},\ldots,r_{il})$ and a class label $c_i \in \{1, 0\}$ indicating the presence or absence of human movement. These samples are utilized to train Support Vector Machine (SVM) classifiers. In the testing phase, the classifier is presented with an unlabeled sample $(r, c)$, where $r \in \mathbb{R}^l$ is the CSI feature vector, and the goal is to ascertain the label $c$, determining human movement in the sensing area.
+
+Prior to classification, normalizing the CSI features is crucial for enhancing accuracy and convergence speed. Normalization of each feature is achieved by calculating the minimum $r_{\text{min}, j} = \min_i r_{ij}$ and maximum $r_{\text{max}, j} = \max_i r_{ij}$ values for the $j$-th feature. The normalized value of $r_{ij}$ is then computed as follows:
+```math
+\begin{equation}
+r_{ij} = \frac{r_{ij} - r_{\text{min}, j}}{r_{\text{max}, j} - r_{\text{min}, j}}
+\end{equation}
+```
+
+For classification, C-Support Vector Classification (C-SVC) is adopted, which solves the optimization problem:
+```math
+\begin{equation}
+\min \quad \frac{1}{2}\|\omega\|^2 + C\sum_{i=1}^{n}\xi_i \quad \text{s.t.} \quad \begin{cases}
+c_i(\omega^T r_i + b) \geq 1 - \xi_i,\\
+C > 0, \xi_i \geq 0,
+\end{cases}
+\end{equation}
+```
+where $\omega \in \mathbb{R}^l$ is the orientation vector of the separating hyperplane, $b \in \mathbb{R}$ its offset, and $C$ a regularization parameter. The $\xi_i$'s are slack variables allowing misclassification. The classification function is then given by:
+```math
+\begin{equation}
+f(r) = \text{sign}\left(\sum_{i=1}^{n}c_i\alpha_i K(r_i,r) + b\right),
+\end{equation}
+```
+where $\alpha_i$ are Lagrange multipliers and $K(r_i, r)$ is the kernel function. The Radial Basis Function (RBF) is chosen as the kernel:
+```math
+\begin{equation}
+K(x_i, x_j) = \exp\left(-\gamma \|x_i - x_j\|^2\right),
+\end{equation}
+```
+with $\gamma > 0$ as the kernel parameter. A positive $f(r)$ indicates human presence, while a non-positive value implies absence. For movement detection, a binary classification using C-SVC is employed, requiring tuning of $C$ and $\gamma$ through grid searching and cross-validation. In this system, $C$ is set to 0.1.
 
 
 ### 4 Motion seperation
