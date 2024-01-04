@@ -44,13 +44,13 @@ This scenario complicates the observation of the Doppler effect. To address thes
 \begin{split}
 x_{cm}(f,t_0 + t) &= x_1(f,t_0 + t)\bar{x}_2(f,t_0 + t)\\
 &=(x_{1,s}(f,t_0) + A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}} )(\bar{x}_{2,s}(f,t_0) + A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}} )\\
-& = \underbrace{x_{1,s}(f,t_0)\bar{x}_{2,s}(f,t_0)}_{\textcircled{1}} + \underbrace{x_{1,s}(f,t_0)A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}}}_{\textcircled{2}} \\
-&+ \underbrace{\bar{x}_{2,s}(f,t_0)A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}}}_{\textcircled{3}} + 
-\underbrace{A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}}A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}}}_{\textcircled{4}} 
+& = \underbrace{x_{1,s}(f,t_0)\bar{x}_{2,s}(f,t_0)}_{(1)} + \underbrace{x_{1,s}(f,t_0)A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}}}_{(2)} \\
+&+ \underbrace{\bar{x}_{2,s}(f,t_0)A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}}}_{(3)} + 
+\underbrace{A_{1,p}(t)e^{-j2\pi f_{1,p} \tau_{1,p}}A_{2,p}(t)e^{j2\pi f_{2,p} \tau_{2,p}}}_{(4)} 
 \end{split}
 ```
-<b>2 Remove static component:</b> The static-path component product (\textcircled{1}) is considered constant over short periods and is subtracted from the conjugate multiplication to prevent interference with Doppler monitoring.<br>
-<b>3 Adjust the power of each antenna:</b> By modifying the power of static components for each antenna (subtracting $\alpha$ and adding $\beta$), the Doppler effect information is preserved, and the correct phase becomes prominent in the spectrum, as equation \eqref{5.3} explains:
+<b>2 Remove static component:</b> The static-path component product (1) is considered constant over short periods and is subtracted from the conjugate multiplication to prevent interference with Doppler monitoring.<br>
+<b>3 Adjust the power of each antenna:</b> By modifying the power of static components for each antenna (subtracting $\alpha$ and adding $\beta$), the Doppler effect information is preserved, and the correct phase becomes prominent in the spectrum, as equation explains:
 ```math
 \begin{split}
 &x_{cm}(f,t_0 + t) - x_{1,s}(f,t_0)\bar{x}_{2,s}(f,t_0) = x_1(f,t_0 + t)\bar{x}_2(f,t_0 + t) - x_{1,s}(f,t_0)\bar{x}_{2,s}(f,t_0)\\
