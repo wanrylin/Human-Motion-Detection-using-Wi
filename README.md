@@ -136,7 +136,7 @@ For this specific application, the Random Forest parameters are set with $n = 10
 ### 5 Motion classification
 In this section, subcarrier integration, resampling and denoising algorithms are same for walk classification and other motion classification.
 
-#### Channel clean
+#### 5.1 Channel clean
 As discussed in Section 4, CSI amplitude data is integrated using Principal Component Analysis (PCA), with the first 10 components being utilized. Subsequent to the discussion in Section 2, it is observed that the amplitude fluctuations caused by walking are significant enough to affect both channels. This indicates that the characteristics of walking motion are sufficiently distinct to overpower the noise and interference from multipath effects. However, for other motions, the signals from subsidiary channels tend to dominate, obscuring the fluctuations caused by human movement. To address this, I propose an algorithm aimed at mitigating interference from these subsidiary channels. Following left figure illustrates the first two components after applying PCA.
 
 <p float="left">
@@ -150,17 +150,39 @@ As discussed in Section 4, CSI amplitude data is integrated using Principal Comp
 
 Post-channel cleaning, the components undergo interpolation to fill in any gaps from removed samples. The effectiveness of this process is evident in the right figure, which showcases the successful removal of subsidiary channel interference following PCA.
 
-#### Feature process
+#### 5.2 Feature process
+To enhance the accuracy of human motion classification using Channel State Information (CSI) data, a feature enhancement method is proposed following data denoising. This method focuses on amplifying meaningful CSI features related to human motion, which might initially be too subtle to detect[^6]. It involves calculating the moving variance of the CSI stream using a sliding window of length $L$. This window moves across the CSI samples, computing the variance around each packet. High moving variance values indicate significant fluctuations in the CSI stream due to dynamic human motion, while low values suggest minor fluctuations typical of a stable environment. Consequently, this approach not only highlights human motion features but also accentuates the differences between various types of motions, thereby facilitating more accurate classification.
 
-#### 1DCNN classifier
+The moving variance, denoted as $CSI_{mv}$, is calculated as follows:
+```math
+\begin{split}
+CSI_{mv} &= \sum_{i=1}^{n} \left[ \frac{1}{L-1} \sum_{j=1}^{L} |CSI_{j\in L} - \mu|^2 \right], \
+\mu &= \frac{1}{L} \sum_{j=1}^{L} CSI_j
+\end{split}
+```
+Here, $\mu$ represents the mean of the CSI samples within the sliding window, and $j$ is the sample index within this window. The variable $i$ indicates the current position of the sample in the overall CSI stream.
 
+#### 5.3 1DCNN classifier
+In essence, a convolutional neural network (CNN) is a type of neural network that consists of several convolutional layers and pooling layers. These layers work collaboratively to extract features from data, such as images, sounds, and text, enabling the network to recognize and classify the data based on these features[^7].
 
+Researchers frequently employ CNNs, renowned for image recognition, to classify CSI data. They convert CSI data into image-like formats and utilize 2D CNNs for classification [^8]. However, when the PCA components are used as inputs to a neural network, convolution along the component dimension is not meaningful. Additionally, as the data is one-dimensional time series, one-dimensional CNNs, with their simpler structure and reduced parameter requirements, become more suitable. This approach is not only resource-efficient but also apt for rapid gesture recognition. Following figure illustrates the structure of a 1D CNN.
+<img src="https://github.com/wanrylin/Human-Motion-Detection-using-WiFi/blob/main/figure/1dcnn.png" alt="Structure of the one-dimensional CNN" width="600"><br>
+
+In the convolution layer, the network performs convolutions on segments of the input signal, generating one-dimensional feature maps. Different convolution kernels extract varied features from the input signal, with each kernel detecting specific features at all positions on the input map. Given that the length of the extracted CSI waveform is padded to $N$, the $kernel\ size$ must be less than $N$, and the number of filters is denoted as $n_{filter}$ [^9].
+
+Following the convolution layer, there is a substantial increase in the number of feature maps and the dimensionality of data features. To manage this complexity, a pooling layer is employed for feature processing, parameter reduction, and main feature extraction. Through successive convolution and pooling layers, the dense layer finally outputs the classification results, typically using the softmax activation function [^10].
+
+**For walk direction classification**, the architecture includes 1 input layer and 2 convolutional layers, each followed by a maxpooling layer. This is succeeded by 1 dense layer and 1 output layer. In this configuration, $N$ is set to 200. The first convolutional layer has $n_{filter} = 32$ and $kernel\ size = 3$, while the second layer has $n_{filter} = 16$ and $kernel\ size = 3$. The maxpooling layers use a kernel size of 2.
+
+**For other motion direction classification**, the structure comprises 1 input layer and 4 convolutional layers, followed by 1 dense layer and 1 output layer. Here, $N$ is set to 190. The first convolutional layer has $n_{filter} = 128$ and $kernel\ size = 3$, and the second $n_{filter} = 96$ and $kernel\ size = 3$. Each convolutional layer is succeeded by a maxpooling layer with a kernel size of 2. The subsequent two convolutional layers have $n_{filter} = 64$, $kernel\ size = 3$ and $n_{filter} = 32$, $kernel\ size = 5$, respectively.
 
 ## Result and conclusion
-### Result
-
-
-### Conclusion
+**(1)**
+To the best of my acknowledgment, this system is the first one to detect 7 human motions in through the wall scenario.<br>
+**(2)**
+I successfully design a system for through the wall scenario that can achieve 98\% accuracy in human movement detection and over 95\% accuracy in human motion classification. <br>
+**(3)**
+I proposed a new channel clean algorithm especially for reduce the multipath interference in through the wall scenario.
 
 
 
@@ -172,3 +194,8 @@ Post-channel cleaning, the components undergo interpolation to fill in any gaps 
 [^4]:Hastie, Trevor, et al. The elements of statistical learning: data mining, inference, and prediction. Vol. 2. New York: springer, 2009.
 [^5]:Elbasiony, Reda, and Walid Gomaa. "WiFi localization for mobile robots based on random forests and GPLVM." 2014 13th International Conference on Machine Learning and Applications. IEEE, 2014.
 [^5]:Chen, Guoliang, et al. "Integrated WiFi/PDR/Smartphone using an unscented kalman filter algorithm for 3D indoor localization." Sensors 15.9 (2015): 24595-24614.
+[^6]:Dong, Zehua, et al. "Indoor motion detection using Wi-Fi channel state information in flat floor environments versus in staircase environments." Sensors 18.7 (2018): 2177.
+[^7]:Zhuang, Wei, et al. "A brain-computer interface system for smart home control based on single trial motor imagery EEG." International Journal of Sensor Networks 34.4 (2020): 214-225.
+[^8]:Guo, Linlin, et al. "HuAc: Human activity recognition using crowdsourced WiFi signals and skeleton data." Wireless Communications and Mobile Computing 2018 (2018): 1-15.
+[^9]:Shen, Xingfa, et al. "WiPass: 1D-CNN-based smartphone keystroke recognition using WiFi signals." Pervasive and Mobile Computing 73 (2021): 101393.
+[^10]:Yang, Haixia, et al. "Recognition for human gestures based on convolutional neural network using the off-the-shelf Wi-Fi routers." Wireless Communications and Mobile Computing 2021 (2021): 1-12.
